@@ -1,20 +1,25 @@
-const staticCacheName = 'site-static';
+const Version = '0.0.2';
+const staticCacheName = `site-static-${Version}`;
+const dynamicCache = 'dynamic-chache';
 const timeStamp = Date.now();
 const assets = [
     '/',
     '/index.html',
-    `/assets/css/main.css?timestamp=${timeStamp}`,
-    `/assets/css/bootstrap.min.css?timestamp=${timeStamp}`
+    '/assets/css/main.css',
+    '/assets/css/bootstrap.min.css',
+    '/assets/js/app.js',
+    '/manifest.json',
+    '/assets/icons'
 
 ]
 // install event
 self.addEventListener('install', event => {
     
-    console.log('service worker installed');
+   // console.log('service worker installed');
     event.waitUntil(
         caches.open(staticCacheName).then(cache =>{
-           
-            cache.addAll(assets)
+            console.log('caching shell assets');
+            cache.addAll(assets)  //assets with chace
         })
     )
    
@@ -22,8 +27,19 @@ self.addEventListener('install', event => {
 });
   
 // activate event
-self.addEventListener('activate', evt => {
+self.addEventListener('activate', event => {
     console.log('service worker activated');
+//delete All old caches
+event.waitUntil(
+    caches.keys().then(keys =>{
+            //console.log(keys); //
+                return Promise.all(keys
+                    .filter(key => key !== staticCacheName ).map(key => caches.delete(key))
+                    )
+        }
+    )
+)
+
 });
   
   // fetch event
